@@ -44,7 +44,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               id: fetchedUserFromServer.id,
               username: fetchedUserFromServer.username,
               icon: fetchedUserFromServer.icon,
+              mainwallet: publicKey.toBase58(),
             });
+            // we have to check if the route is /connect-wallet or not
+            // if yes then we have to redirect to the user profile page
+            // else return form this code
+            if (router.pathname !== '/connect-wallet') {
+              setAuthenticationState(AuthState.AUTHENTICATED);
+              return;
+            }
             if (prevAsPath === '/') {
               router.push({
                 pathname: '/[username]',

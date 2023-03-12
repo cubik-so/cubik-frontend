@@ -1,7 +1,7 @@
 import { projectType } from '@/interfaces/project';
-import { Container, VStack } from '@chakra-ui/react';
-import { ProjectsAboutAndDonation } from 'src/components/Projects/ProjectsDetail/ProjectComponents/ProjectAboutAndDonation';
-import { ProjectDetailLayout } from 'src/components/Projects/ProjectsDetail/ProjectDetailsLayout';
+import { Container, Stack } from '@chakra-ui/react';
+import { AboutProject } from 'src/components/Projects/ProjectsDetail/AboutProject';
+import { ProjectInteractions } from 'src/components/Projects/ProjectsDetail/ProjectInteractions';
 import { getProjectByID } from 'src/lib/api/projectsHelper';
 
 export type projectPropsType = {
@@ -14,13 +14,11 @@ const ProjectDetails = (props: projectPropsType) => {
   console.log('Project data from server side rendered component - ', props);
 
   return (
-    <Container maxW="6xl" py={{ base: '1rem', md: '2rem' }}>
-      <VStack gap="2rem">
-        {/* @ts-ignore */}
-        <ProjectsAboutAndDonation projectDetails={props.projectData.data} />
-        {/* @ts-ignore */}
-        <ProjectDetailLayout projectDetails={props.projectData.data} />
-      </VStack>
+    <Container maxW="7xl" py={{ base: '1rem', md: '2rem' }}>
+      <Stack direction={{ base: 'column', md: 'row' }} gap="2rem">
+        <AboutProject projectDetails={props.projectData.data} />
+        <ProjectInteractions projectDetails={props.projectData.data} />
+      </Stack>
     </Container>
   );
 };
