@@ -1,5 +1,4 @@
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
-import Discussions from './Discussions';
 
 export const ProjectsTabs = () => {
   return (
@@ -10,9 +9,7 @@ export const ProjectsTabs = () => {
         <Tab fontSize={{ base: 'sm', md: 'md' }}>Contributors</Tab>
       </TabList>
       <TabPanels p={{ base: '1rem', md: '0rem' }}>
-        <TabPanel>
-          <Discussions />
-        </TabPanel>
+        <TabPanel>{/* <Discussions /> */}</TabPanel>
         <TabPanel>Cohorts</TabPanel>
         <TabPanel>Contributors</TabPanel>
       </TabPanels>

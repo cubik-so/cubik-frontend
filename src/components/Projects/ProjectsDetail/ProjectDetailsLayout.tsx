@@ -9,6 +9,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
+import { Key } from 'react';
 import {
   FaDiscord,
   FaTelegramPlane,
@@ -17,8 +18,8 @@ import {
 } from 'react-icons/fa';
 import { HiFlag, HiLink } from 'react-icons/hi';
 import { getDomain } from 'src/lib/functions';
+import { IUser } from 'src/store/userStore';
 import { ProjectsDetailedDescription } from './ProjectComponents/DetailedDescription';
-import { ProjectsTabs } from './ProjectComponents/ProjectTabs';
 
 const ProjectLink = ({ urlName }: { urlName: string }) => {
   switch (urlName) {
@@ -39,13 +40,9 @@ const ProjectLink = ({ urlName }: { urlName: string }) => {
   }
 };
 
-type ProjectOwnersType = { name: string; image: string; pubKey: string };
-const ProjectOwners = ({
-  projectOwners,
-}: {
-  projectOwners: ProjectOwnersType[];
-}) => {
-  return projectOwners.map((projectOwner: ProjectOwnersType, key: any) => (
+const ProjectOwners = ({ projectOwners }: { projectOwners: IUser }) => {
+  //const projectOwnersData = JSON.parse(projectOwners);
+  return projectOwners.map((projectOwner: IUser, key: any) => (
     <HStack
       // pt="0.5rem"
       key={key}
@@ -56,8 +53,8 @@ const ProjectOwners = ({
       justifyContent={'space-between'}
     >
       <HStack gap="0.6rem">
-        <Avatar size={{ base: 'sm', md: 'sm' }} src={projectOwner.image} />
-        <Text fontSize={{ base: 'sm', md: 'md' }}>{projectOwner.name}</Text>
+        <Avatar size={{ base: 'sm', md: 'sm' }} src={projectOwner.icon} />
+        <Text fontSize={{ base: 'sm', md: 'md' }}>{projectOwner.username}</Text>
       </HStack>
       {/* <Text
         display={{ base: 'none', sm: 'block', md: 'block' }}
@@ -71,6 +68,7 @@ const ProjectOwners = ({
 
 // sidebar
 const SideBar = ({ projectDetails }: { projectDetails: projectType }) => {
+  const socials = JSON.parse(projectDetails.socials);
   return (
     <Stack
       justify={'space-between'}
@@ -97,20 +95,25 @@ const SideBar = ({ projectDetails }: { projectDetails: projectType }) => {
             fontSize={{ base: 'sm', sm: 'md', md: 'lg' }}
             leftIcon={<ProjectLink urlName={'url'} />}
           >
-            {getDomain(projectDetails.url)}
+            {getDomain(projectDetails.project_link)}
           </Button>
-          {projectDetails?.socials?.map((link, key) => (
-            <Button
-              iconSpacing={'0.8rem'}
-              h="fit-content"
-              variant={'unstyled'}
-              fontSize={{ base: 'sm', sm: 'md', md: 'lg' }}
-              key={key}
-              leftIcon={<ProjectLink urlName={link.name} />}
-            >
-              {getDomain(link.url)}
-            </Button>
-          ))}{' '}
+          {socials.map(
+            (
+              link: { name: string; url: string },
+              key: Key | null | undefined
+            ) => (
+              <Button
+                iconSpacing={'0.8rem'}
+                h="fit-content"
+                variant={'unstyled'}
+                fontSize={{ base: 'sm', sm: 'md', md: 'lg' }}
+                key={key}
+                leftIcon={<ProjectLink urlName={link.name} />}
+              >
+                {getDomain(link.url)}
+              </Button>
+            )
+          )}{' '}
           <Button
             variant={'unstyled'}
             iconSpacing={'0.8rem'}
@@ -128,7 +131,7 @@ const SideBar = ({ projectDetails }: { projectDetails: projectType }) => {
           Project Owners
         </Heading>
         {/* @ts-ignore */}
-        <ProjectOwners projectOwners={projectDetails.project_owners} />
+        {/* <ProjectOwners projectOwners={projectDetails.owner} /> */}
       </Box>
     </Stack>
   );
@@ -153,9 +156,9 @@ export const ProjectDetailLayout = ({
     >
       <Stack alignSelf={'start'} maxW={'45rem'} direction={'column'} gap="2rem">
         <ProjectsDetailedDescription
-          description={projectDetails.detailed_description}
+          description={projectDetails.long_description}
         />
-        <ProjectsTabs />
+        {/* <ProjectsTabs /> */}
       </Stack>
       <SideBar projectDetails={projectDetails} />
     </Stack>

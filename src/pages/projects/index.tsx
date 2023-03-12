@@ -1,3 +1,4 @@
+import { projectType } from '@/interfaces/project';
 import {
   Box,
   Container,
@@ -16,32 +17,46 @@ import { BiSearch } from 'react-icons/bi';
 import FundingRoundBanner from 'src/components/FundingRounds/FundingRoundBanner';
 import ProjectList from 'src/components/Projects/ProjectsPage/ProjectList';
 import SEO from 'src/components/SEO';
+import { getAllProjects } from 'src/lib/api/projectsHelper';
 
-const Data = [{ name: '' }];
+type projectsPropsType = {
+  allProjectsData: {
+    data: [projectType];
+  };
+};
 
-const Projects = () => {
+const Projects = (props: projectsPropsType) => {
+  const fetchedPropsData = props.allProjectsData.data.map(
+    (element: { industry: string; socials: string }) => ({
+      ...element,
+      industry: JSON.parse(element.industry),
+      socials: JSON.parse(element.socials),
+    })
+  );
   const [wordEntered, setWordEntered] = useState();
   const [searchResult, setSearchResult] = useState(false);
-  const [projectsData, setProjectsData] = useState(Data);
-  //const { requestGatewayToken } = useGateway();
+  const [projectsData, setProjectsData] = useState(fetchedPropsData);
+
+  console.log('get all projects data - ', fetchedPropsData);
   const handleSearch = (event: { target: { value: any } }) => {
     const searchWord = event.target.value;
     setWordEntered(searchWord);
 
     if (searchWord === '') {
       setSearchResult(false);
-      return setProjectsData(Data);
+      return setProjectsData(props.allProjectsData.data);
     }
 
     if (searchWord !== '') {
       setSearchResult(true);
     }
 
-    const newFilter = Data.filter((value) => {
+    const newFilter = projectsData.filter(({ value }: any) => {
       return value.name.toLowerCase().includes(searchWord.toLowerCase());
     });
     setProjectsData(newFilter);
   };
+
   return (
     <>
       <SEO
@@ -108,10 +123,10 @@ const Projects = () => {
               </TabList>
               <TabPanels>
                 <TabPanel>
-                  <ProjectList />
+                  <ProjectList allProjectsData={projectsData} />
                 </TabPanel>
                 <TabPanel>
-                  <ProjectList />
+                  <ProjectList allProjectsData={projectsData} />
                 </TabPanel>
               </TabPanels>
             </Tabs>
@@ -121,5 +136,22 @@ const Projects = () => {
     </>
   );
 };
+export async function getServerSideProps() {
+  try {
+    const allProjectsData = await getAllProjects();
+    if (!allProjectsData) {
+      return {
+        notFound: true,
+      };
+    }
+    return {
+      props: { allProjectsData },
+    };
+  } catch (e) {
+    return {
+      notFound: true,
+    };
+  }
+}
 
 export default Projects;

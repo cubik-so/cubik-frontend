@@ -23,7 +23,7 @@ export const ProjectsDonation = ({
   projectDetails: projectType;
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const projectAdd = 'FfZ2TQs8wVjhhytayFqmmckdUNbSxuEcp1oG5LxSmFbV';
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -38,15 +38,15 @@ export const ProjectsDonation = ({
               <Avatar
                 size={{ base: 'sm', md: 'md' }}
                 src={projectDetails.logo}
-                name={projectDetails.name}
+                name={projectDetails.project_name}
               />
               <VStack gap="0" spacing="0" alignItems={'start'} justify="center">
                 <Heading color="white" fontSize={{ base: 'md', md: 'xl' }}>
-                  {projectDetails.name}
+                  {projectDetails.project_name}
                 </Heading>
 
                 <WalletAdd
-                  walletAddress={projectAdd}
+                  walletAddress={projectDetails.owner_publickey}
                   size="xs"
                   copy={true}
                   color="#E2DBDB"
@@ -72,7 +72,6 @@ export const ProjectsDonation = ({
         position={'fixed'}
         right="20rem"
         w={{ base: 'auto', sm: 'auto', md: '18rem' }}
-        //width={{ base: 'auto', lg: '9rem' }}
         alignItems={{ base: 'center', md: 'start' }}
       >
         <VStack gap="0" spacing="0" alignItems={'start'} pb="0.5rem">
