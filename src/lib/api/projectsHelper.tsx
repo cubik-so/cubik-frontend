@@ -5,6 +5,7 @@ export const createProject = async ({
   owner_publickey,
   long_description,
   short_description,
+  project_link,
   logo,
   industry,
   twitter,
@@ -16,8 +17,9 @@ export const createProject = async ({
       .post(process.env.NEXT_PUBLIC_BACKEND_URL + `/project/create`, {
         project_name,
         logo,
-        long_description,
         short_description,
+        project_link,
+        long_description: JSON.stringify(long_description),
         industry: JSON.stringify(industry),
         socials: JSON.stringify([
           { name: 'Twitter', url: twitter },
@@ -40,13 +42,11 @@ export const createProject = async ({
 export const getAllProjects = async (): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
-      .get(process.env.NEXT_PUBLIC_BACKEND_URL + `/project/`)
+      .get(process.env.NEXT_PUBLIC_BACKEND_URL + `/project/find/all`)
       .then((res) => {
-        console.log('response from get all project', res);
         resolve(res.data);
       })
       .catch((e) => {
-        console.error('error from get all project', e);
         reject(e);
       });
   });
@@ -56,14 +56,12 @@ export const getProjectByID = async ({ project_id }: any): Promise<any> => {
   return new Promise((resolve, reject) => {
     axios
       .get(
-        process.env.NEXT_PUBLIC_BACKEND_URL + `/project/find/id=` + project_id
+        process.env.NEXT_PUBLIC_BACKEND_URL + `/project/find?id=` + project_id
       )
       .then((res) => {
-        console.log('response from get all project', res);
         resolve(res.data);
       })
       .catch((e) => {
-        console.error('error from get all project', e);
         reject(e);
       });
   });

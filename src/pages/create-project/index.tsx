@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Select } from 'chakra-react-select';
+import { useRouter } from 'next/router';
 import { Controller, useForm } from 'react-hook-form';
 import { createProject } from 'src/lib/api/projectsHelper';
 
@@ -76,6 +77,7 @@ const Industry = [
 
 const CreateProject = () => {
   const { publicKey } = useWallet();
+  const router = useRouter();
 
   const {
     control,
@@ -89,6 +91,7 @@ const CreateProject = () => {
     // send a request to this route and submit project
     // /project/create
     createProject({
+      project_link: values.project_link,
       project_name: values.project_name,
       owner_publickey: publicKey?.toBase58(),
       long_description: values.long_description,
@@ -100,6 +103,10 @@ const CreateProject = () => {
       discord: values.discord,
     }).then((res) => {
       console.log('project create response - ', res);
+      router.push({
+        pathname: '/projects/[projectId]',
+        query: { projectId: res.data.id },
+      });
     });
   }
   return (

@@ -10,12 +10,13 @@ import {
 } from '@chakra-ui/react';
 import CustomTag from 'src/components/UI/Tags';
 import { ProjectsDonation } from './Donations';
-// section 1
+
 export const ProjectsAboutAndDonation = ({
   projectDetails,
 }: {
   projectDetails: projectType;
 }) => {
+  const categories = JSON.parse(projectDetails.industry);
   return (
     <Container
       maxW="6xl"
@@ -38,20 +39,20 @@ export const ProjectsAboutAndDonation = ({
           spacing={{ base: '0.2rem', md: '0.8rem' }}
         >
           <Heading fontSize={{ base: 'xl', md: '3xl' }}>
-            {projectDetails.name}
+            {projectDetails.project_name}
           </Heading>
           <Text
             noOfLines={{ base: 2, md: 3 }}
             color="#CBCBCB"
             fontSize={{ base: 'xs', md: 'md' }}
           >
-            {projectDetails.about}
+            {projectDetails.short_description}
           </Text>
           <Wrap flexDirection={'row'} spacing="0.4rem" pt="0.5rem">
-            {projectDetails.tags.map((tag, key) => {
+            {categories.map((tag: any, key: React.Key | null | undefined) => {
               return (
-                <CustomTag color={tag} key={key}>
-                  {tag}
+                <CustomTag color={tag.label} key={key}>
+                  {tag.label}
                 </CustomTag>
               );
             })}
