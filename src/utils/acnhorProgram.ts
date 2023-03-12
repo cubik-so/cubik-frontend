@@ -79,3 +79,36 @@ export const ProjectIx = async (
 
   return ix;
 };
+
+export const ContributionAccount = async (
+  anchorWallet: anchor.Wallet,
+  projectId: string,
+  contribution_id: string,
+  amount: number,
+  usd_amount: number,
+  token: string
+) => {
+  const program = anchorProgram(anchorWallet);
+  const [contribution_account] = anchor.web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('contribution'), Buffer.from(contribution_id)],
+    program.programId
+  );
+  const ix = await program.methods
+    .createContribution(
+      '40efe896d284',
+      projectId,
+      contribution_id,
+      new anchor.BN(amount),
+      new anchor.BN(usd_amount),
+      new anchor.web3.PublicKey(token)
+    )
+    .accounts({
+      authority: anchorWallet.publicKey,
+      contributionAccount: contribution_account,
+      systemProgram: anchor.web3.SystemProgram.programId,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    })
+    .instruction();
+
+  return ix;
+};
