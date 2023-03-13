@@ -1,22 +1,15 @@
-import { contributions } from './contributions';
-import { userType } from './user';
+import { IUser } from 'src/store/userStore';
 
 export type projectType = {
-  name: string;
+  id: string;
+  industry: any;
   logo: string;
-  about: string;
-  tags: string[];
-  url: string;
-  total_funding_raised: number;
-  detailed_description: string;
-  owner?: userType;
-  contributors?: contributions[];
-  socials?: [{ name: string; url: string }];
-  project_owners?: [
-    {
-      name: string;
-      image: string;
-      pubkey: string;
-    }
-  ];
+  long_description: string;
+  owner: IUser;
+  owner_publickey: string;
+  project_name: string;
+  short_description: string;
+  socials: any;
+  project_link: string;
+  total: number;
 };

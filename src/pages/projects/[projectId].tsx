@@ -1,21 +1,24 @@
-import { Container, VStack } from '@chakra-ui/react';
+import { projectType } from '@/interfaces/project';
+import { Container, Stack } from '@chakra-ui/react';
+import { AboutProject } from 'src/components/Projects/ProjectsDetail/AboutProject';
+import { ProjectInteractions } from 'src/components/Projects/ProjectsDetail/ProjectInteractions';
 import { getProjectByID } from 'src/lib/api/projectsHelper';
 
-type projectPropsType = {
-  projectData: any;
+export type projectPropsType = {
+  projectData: {
+    data: projectType;
+  };
 };
 
 const ProjectDetails = (props: projectPropsType) => {
   console.log('Project data from server side rendered component - ', props);
 
   return (
-    <Container maxW="6xl" py={{ base: '1rem', md: '2rem' }}>
-      <VStack gap="2rem">
-        {/* @ts-ignore */}
-        {/* <ProjectsAboutAndDonation projectDetails={project[0]} /> */}
-        {/* @ts-ignore */}
-        {/* <ProjectDetailLayout projectDetails={project[0]} /> */}
-      </VStack>
+    <Container maxW="7xl" py={{ base: '1rem', md: '2rem' }}>
+      <Stack direction={{ base: 'column', md: 'row' }} gap="2rem">
+        <AboutProject projectDetails={props.projectData.data} />
+        <ProjectInteractions projectDetails={props.projectData.data} />
+      </Stack>
     </Container>
   );
 };
@@ -24,9 +27,9 @@ const ProjectDetails = (props: projectPropsType) => {
 export async function getServerSideProps(context: { query: any }) {
   const { query } = context;
   const { projectId } = query;
-
+  console.log('project id - ', projectId);
   try {
-    const projectData = await getProjectByID({ projectId });
+    const projectData = await getProjectByID({ project_id: projectId });
     console.log('project data from server - ', projectData);
     if (!projectData) {
       return {

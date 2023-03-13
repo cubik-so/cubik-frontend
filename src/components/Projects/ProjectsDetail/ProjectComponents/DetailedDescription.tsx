@@ -1,6 +1,7 @@
-import { Box, Heading } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import { Link, LinkProps } from '@chakra-ui/react';
 
@@ -9,6 +10,9 @@ export const ProjectsDetailedDescription = ({
 }: {
   description: string;
 }) => {
+  const projectDescription =
+    description[0] === '"' ? JSON.parse(description) : description;
+
   const newTheme = {
     a: (props: LinkProps) => {
       const { children } = props;
@@ -22,11 +26,14 @@ export const ProjectsDetailedDescription = ({
 
   return (
     <Box>
-      <Heading pb="0.5rem" fontSize={{ base: 'md', md: '2xl' }}>
+      <Box as="p" textStyle={'title2'} pt="2rem" pb="0.8rem">
         About Project
-      </Heading>
-      <ReactMarkdown components={ChakraUIRenderer(newTheme)}>
-        {description}
+      </Box>
+      <ReactMarkdown
+        components={ChakraUIRenderer(newTheme)}
+        remarkPlugins={[remarkGfm]}
+      >
+        {projectDescription}
       </ReactMarkdown>
     </Box>
   );

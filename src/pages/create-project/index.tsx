@@ -15,6 +15,7 @@ import * as anchor from '@project-serum/anchor';
 import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 import { useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
 import { Select } from 'chakra-react-select';
+import { useRouter } from 'next/router';
 import { Controller, useForm } from 'react-hook-form';
 import { createProject } from 'src/lib/api/projectsHelper';
 import { connection, ProjectIx } from 'src/utils/acnhorProgram';
@@ -80,6 +81,8 @@ const Industry = [
 const CreateProject = () => {
   const { publicKey } = useWallet();
   const wallet = useAnchorWallet();
+  const router = useRouter();
+
   const {
     control,
     handleSubmit,
@@ -114,6 +117,10 @@ const CreateProject = () => {
         discord: values.discord,
       }).then((res) => {
         console.log('project create response - ', res);
+        router.push({
+          pathname: '/projects/[projectId]',
+          query: { projectId: res.data.id },
+        });
       });
     }
   }

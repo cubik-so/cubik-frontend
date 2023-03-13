@@ -7,7 +7,6 @@ import {
   Container,
   Heading,
   HStack,
-  useDisclosure,
   VStack,
   Wrap,
 } from '@chakra-ui/react';
@@ -16,24 +15,20 @@ import React from 'react';
 import { BiLink } from 'react-icons/bi';
 import CustomTag from 'src/components/UI/Tags';
 import { formatNumberWithK, getDomain } from 'src/lib/functions';
-import ProjectsData from '../../../data/projects.json';
 
 type PropsType = {
   project: projectType;
 };
 
 const ProjectCard = ({ project }: PropsType) => {
-  const { isOpen, onToggle } = useDisclosure();
   const router = useRouter();
+  console.log(project);
   return (
     <Center
-      //onMouseOver={onToggle}
-      // onMouseLeave={onToggle}
       onClick={() => {
-        router.push('/projects/' + project.name);
         router.push({
           pathname: '/projects/[projectId]',
-          query: { projectID: '' },
+          query: { projectId: project.id },
         });
       }}
       w="100%"
@@ -72,16 +67,16 @@ const ProjectCard = ({ project }: PropsType) => {
               as="p"
               textStyle={{ base: 'title4', md: 'title2' }}
             >
-              {project.name}
+              {project.project_name}
             </Box>
             <Heading as="p" textStyle={{ base: 'title2', md: 'title1' }}>
-              ${formatNumberWithK(project.total_funding_raised)}
+              ${formatNumberWithK(project.total)}
             </Heading>
           </HStack>
           <HStack w="full" justify="space-between">
             <Button
               as="a"
-              href={project.url}
+              href={project.project_link}
               target="_blank"
               h="fit-content"
               leftIcon={<BiLink />}
@@ -98,7 +93,7 @@ const ProjectCard = ({ project }: PropsType) => {
                 textDecoration: 'underline',
               }}
             >
-              {getDomain(project.url)}
+              {getDomain(project.project_link)}
             </Button>
             <Box
               color="#B4B0B2"
@@ -119,44 +114,30 @@ const ProjectCard = ({ project }: PropsType) => {
           noOfLines: '2',
         }}
       >
-        {project.about}
+        {project.short_description}
       </Box>
       <Wrap w="full" mt="auto" pb="0.4rem">
-        {project.tags.map((tag: string, key: React.Key | null | undefined) => {
-          return (
-            <CustomTag color={tag} key={key}>
-              {tag}
-            </CustomTag>
-          );
-        })}
+        {project.industry.map(
+          (
+            tag: { label: string; value: string; colorScheme: string },
+            key: React.Key | null | undefined
+          ) => {
+            return (
+              <CustomTag color={tag.label} key={key}>
+                {tag.label}
+              </CustomTag>
+            );
+          }
+        )}
       </Wrap>
-      {/* <SlideFade in={isOpen} offsetY="20px">
-        <Box
-          p="40px"
-          color="white"
-          mt="4"
-          bg="teal.500"
-          rounded="md"
-          shadow="md"
-        >
-          <Button>Hello world</Button>
-        </Box>
-      </SlideFade> */}
     </Center>
   );
 };
-const ProjectList = () => {
+const ProjectList = ({ allProjectsData }: any) => {
+  console.log('project data - ', allProjectsData);
   return (
     <Container maxW="7xl" overflow={'visible'} p="0">
       <Wrap
-        // border="1px solid"
-        // borderColor={{
-        //   base: 'red',
-        //   sm: 'green',
-        //   md: 'blue',
-        //   lg: 'pink',
-        //   xl: 'orange',
-        // }}
         spacing="1.5rem"
         w="100%"
         padding="2rem 0px"
@@ -165,10 +146,11 @@ const ProjectList = () => {
         align="center"
         direction={{ base: 'column', sm: 'row', md: 'row' }}
       >
-        {ProjectsData.map((project, key) => {
-          //@ts-ignore
-          return <ProjectCard project={project} key={key} />;
-        })}
+        {allProjectsData.map(
+          (project: projectType, key: React.Key | null | undefined) => {
+            return <ProjectCard project={project} key={key} />;
+          }
+        )}
       </Wrap>
     </Container>
   );
