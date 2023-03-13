@@ -24,12 +24,14 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js';
+import { QueryClient, useMutation } from '@tanstack/react-query';
 import {
   chakraComponents,
   OptionBase,
   Props,
   Select,
 } from 'chakra-react-select';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useController, UseControllerProps, useForm } from 'react-hook-form';
 import { BsArrowRight, BsTwitter } from 'react-icons/bs';
@@ -172,8 +174,10 @@ const VoteModalBody = ({ project_id }: { project_id: string }) => {
     control,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues });
+  const router = useRouter();
   const [successScreen, setSuccessScreen] = useState(false);
   const [signature, setSignature] = useState<string>('');
+  const queryClient = new QueryClient();
   const { user } = useUserStore();
   function getIx(
     values: any,
@@ -258,6 +262,13 @@ const VoteModalBody = ({ project_id }: { project_id: string }) => {
     }
     // backend
   };
+  const Submitmutation = useMutation({
+    mutationFn: onSubmit,
+    mutationKey: ['contribution'],
+    onSuccess: async () => {
+      queryClient.invalidateQueries(['project', router.query.projectId]);
+    },
+  });
 
   return (
     <Box pt="1rem" pb="2rem">
@@ -270,7 +281,11 @@ const VoteModalBody = ({ project_id }: { project_id: string }) => {
               anything form matching pool.
             </AlertDescription>
           </Alert>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form
+            onSubmit={handleSubmit((e) => {
+              Submitmutation.mutateAsync(e);
+            })}
+          >
             {/* ---- select cohort  ---- */}
             <FormControl
               pb="1.5rem"
@@ -401,7 +416,7 @@ const VoteModalBody = ({ project_id }: { project_id: string }) => {
               fontSize={'md'}
               mt={'3rem'}
               w="full"
-              isLoading={isSubmitting}
+              isLoading={Submitmutation.isLoading}
               type="submit"
             >
               Pay with Wallet

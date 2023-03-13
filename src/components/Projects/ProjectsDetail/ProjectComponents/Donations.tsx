@@ -77,7 +77,10 @@ export const ProjectsDonation = ({
       >
         <VStack align={'end'} gap="0" spacing="0" pb="0.5rem">
           <Box as="p" textStyle="display3">
-            {formatNumberWithK((projectDetails.usd_total as number) * 19)}$
+            {formatNumberWithK(
+              Number(((projectDetails.usd_total as number) * 19).toFixed(2))
+            )}
+            $
           </Box>
           <Box as="p" textStyle="body2" color="#B2B2B2">
             Funding Raised

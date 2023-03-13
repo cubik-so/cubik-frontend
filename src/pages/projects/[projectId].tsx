@@ -1,23 +1,22 @@
-import { projectType } from '@/interfaces/project';
 import { Container, Stack } from '@chakra-ui/react';
+import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
 import { AboutProject } from 'src/components/Projects/ProjectsDetail/AboutProject';
 import { ProjectInteractions } from 'src/components/Projects/ProjectsDetail/ProjectInteractions';
 import { getProjectByID } from 'src/lib/api/projectsHelper';
 
-export type projectPropsType = {
-  projectData: {
-    data: projectType;
-  };
-};
-
-const ProjectDetails = (props: projectPropsType) => {
-  console.log('Project data from server side rendered component - ', props);
-
+const ProjectDetails = () => {
+  const router = useRouter();
+  const projectData = useQuery({
+    queryFn: ({ queryKey }) =>
+      getProjectByID({ project_id: queryKey[1] as string }),
+    queryKey: ['project', router.query.projectId],
+  });
   return (
     <Container maxW="7xl" py={{ base: '1rem', md: '2rem' }}>
       <Stack direction={{ base: 'column', md: 'row' }} gap="2rem">
-        <AboutProject projectDetails={props.projectData.data} />
-        <ProjectInteractions projectDetails={props.projectData.data} />
+        <AboutProject projectDetails={projectData.data.data} />
+        <ProjectInteractions projectDetails={projectData.data.data} />
       </Stack>
     </Container>
   );
@@ -27,17 +26,13 @@ const ProjectDetails = (props: projectPropsType) => {
 export async function getServerSideProps(context: { query: any }) {
   const { query } = context;
   const { projectId } = query;
-  console.log('project id - ', projectId);
+  const queryClient = new QueryClient();
   try {
-    const projectData = await getProjectByID({ project_id: projectId });
-    console.log('project data from server - ', projectData);
-    if (!projectData) {
-      return {
-        notFound: true,
-      };
-    }
+    await queryClient.prefetchQuery(['project', projectId], () =>
+      getProjectByID({ project_id: projectId })
+    );
     return {
-      props: { projectData },
+      props: { dehydratedState: dehydrate(queryClient) },
     };
   } catch (e) {
     return {
