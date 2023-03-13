@@ -1,6 +1,7 @@
 import { projectType } from '@/interfaces/project';
 import {
   Avatar,
+  Box,
   Button,
   Heading,
   HStack,
@@ -10,7 +11,6 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Text,
   useDisclosure,
   VStack,
 } from '@chakra-ui/react';
@@ -25,7 +25,7 @@ export const ProjectsDonation = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <>
+    <Box>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent
@@ -69,24 +69,37 @@ export const ProjectsDonation = ({
         </ModalContent>
       </Modal>
       <VStack
-        position={'fixed'}
+        ml="auto"
         right="20rem"
-        w={{ base: 'auto', sm: 'auto', md: '18rem' }}
+        w={'fit-content'}
         alignItems={{ base: 'center', md: 'start' }}
       >
-        <VStack gap="0" spacing="0" alignItems={'start'} pb="0.5rem">
-          <Heading fontSize={{ base: '2xl', md: '4xl' }}>
+        <VStack align={'end'} gap="0" spacing="0" pb="0.5rem">
+          <Box as="p" textStyle="display3">
             {/* {formatNumberWithK(projectDetails.total_funding_raised)} */}$
             {!localStorage.getItem('amount-con') ? '0' : '0.002'}
-          </Heading>
-          <Text color="#CBCBCB" fontSize={{ base: 'xs', md: 'sm' }}>
+          </Box>
+          <Box as="p" textStyle="body2" color="#B2B2B2">
             Funding Raised
-          </Text>
+          </Box>
         </VStack>
-        <Button onClick={onOpen} rounded="full" w="10rem">
-          Contribute
+        <Button
+          onClick={onOpen}
+          backgroundColor="#D645A6"
+          rounded="full"
+          w="10rem"
+        >
+          <Box
+            as="p"
+            textStyle={'title4'}
+            color="white"
+            textShadow={'md'}
+            _hover={{ color: '#D645A6' }}
+          >
+            Contribute
+          </Box>
         </Button>
       </VStack>
-    </>
+    </Box>
   );
 };
