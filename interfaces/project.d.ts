@@ -12,4 +12,5 @@ export type projectType = {
   socials: any;
   project_link: string;
   total: number;
+  usd_total?: number;
 };
