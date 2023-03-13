@@ -1,6 +1,6 @@
 export type IDL = {
-  version: '0.1.0';
-  name: 'cubic_contract';
+  version: '0.2.0';
+  name: 'cubik_contract';
   instructions: [
     {
       name: 'createUser';
@@ -30,15 +30,11 @@ export type IDL = {
         {
           name: 'userId';
           type: 'string';
-        },
-        {
-          name: 'metadata';
-          type: 'string';
         }
       ];
     },
     {
-      name: 'projectInit';
+      name: 'createProject';
       accounts: [
         {
           name: 'authority';
@@ -63,17 +59,13 @@ export type IDL = {
       ];
       args: [
         {
-          name: 'projectname';
-          type: 'string';
-        },
-        {
-          name: 'metadata';
+          name: 'projectId';
           type: 'string';
         }
       ];
     },
     {
-      name: 'initChort';
+      name: 'createRound';
       accounts: [
         {
           name: 'authority';
@@ -81,7 +73,7 @@ export type IDL = {
           isSigner: true;
         },
         {
-          name: 'chortInitAccount';
+          name: 'roundAccount';
           isMut: true;
           isSigner: false;
         },
@@ -98,13 +90,21 @@ export type IDL = {
       ];
       args: [
         {
-          name: 'chortname';
+          name: 'roundId';
           type: 'string';
+        },
+        {
+          name: 'matchingPool';
+          type: 'u64';
+        },
+        {
+          name: 'projectSize';
+          type: 'u64';
         }
       ];
     },
     {
-      name: 'joinChort';
+      name: 'createContribution';
       accounts: [
         {
           name: 'authority';
@@ -112,17 +112,7 @@ export type IDL = {
           isSigner: true;
         },
         {
-          name: 'initChortAccount';
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: 'projectAccount';
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: 'projectChortAccount';
+          name: 'contributionAccount';
           isMut: true;
           isSigner: false;
         },
@@ -139,17 +129,141 @@ export type IDL = {
       ];
       args: [
         {
-          name: 'chortname';
+          name: 'roundId';
           type: 'string';
         },
         {
-          name: 'projectname';
+          name: 'projectId';
           type: 'string';
+        },
+        {
+          name: 'contributionId';
+          type: 'string';
+        },
+        {
+          name: 'amount';
+          type: 'u64';
+        },
+        {
+          name: 'usdAmount';
+          type: 'u64';
+        },
+        {
+          name: 'token';
+          type: 'publicKey';
         }
       ];
     }
   ];
   accounts: [
+    {
+      name: 'Contribution';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'authority';
+            type: 'publicKey';
+          },
+          {
+            name: 'projectId';
+            type: 'string';
+          },
+          {
+            name: 'roundId';
+            type: 'string';
+          },
+          {
+            name: 'token';
+            type: 'publicKey';
+          },
+          {
+            name: 'amount';
+            type: 'u64';
+          },
+          {
+            name: 'bump';
+            type: 'u8';
+          }
+        ];
+      };
+    },
+    {
+      name: 'Project';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'authority';
+            type: 'publicKey';
+          },
+          {
+            name: 'projectId';
+            type: 'string';
+          },
+          {
+            name: 'bump';
+            type: 'u8';
+          }
+        ];
+      };
+    },
+    {
+      name: 'Round';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'authority';
+            type: 'publicKey';
+          },
+          {
+            name: 'roundId';
+            type: 'string';
+          },
+          {
+            name: 'bump';
+            type: 'u8';
+          },
+          {
+            name: 'poolSize';
+            type: 'u64';
+          },
+          {
+            name: 'projectSize';
+            type: 'u64';
+          }
+        ];
+      };
+    },
+    {
+      name: 'RoundJoin';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'authority';
+            type: 'publicKey';
+          },
+          {
+            name: 'roundId';
+            type: 'string';
+          },
+          {
+            name: 'approve';
+            type: 'bool';
+          },
+          {
+            name: 'bump';
+            type: 'u8';
+          },
+          {
+            name: 'projectId';
+            type: 'string';
+          }
+        ];
+      };
+    },
     {
       name: 'User';
       type: {
@@ -160,72 +274,8 @@ export type IDL = {
             type: 'publicKey';
           },
           {
-            name: 'metadata';
+            name: 'userId';
             type: 'string';
-          },
-          {
-            name: 'bump';
-            type: 'u8';
-          }
-        ];
-      };
-    },
-    {
-      name: 'ProjectInit';
-      type: {
-        kind: 'struct';
-        fields: [
-          {
-            name: 'authority';
-            type: 'publicKey';
-          },
-          {
-            name: 'metadata';
-            type: 'string';
-          },
-          {
-            name: 'bump';
-            type: 'u8';
-          }
-        ];
-      };
-    },
-    {
-      name: 'InitChort';
-      type: {
-        kind: 'struct';
-        fields: [
-          {
-            name: 'authority';
-            type: 'publicKey';
-          },
-          {
-            name: 'chortName';
-            type: 'string';
-          },
-          {
-            name: 'active';
-            type: 'bool';
-          },
-          {
-            name: 'bump';
-            type: 'u8';
-          }
-        ];
-      };
-    },
-    {
-      name: 'ProjectChortInit';
-      type: {
-        kind: 'struct';
-        fields: [
-          {
-            name: 'project';
-            type: 'publicKey';
-          },
-          {
-            name: 'chort';
-            type: 'publicKey';
           },
           {
             name: 'bump';
@@ -237,8 +287,8 @@ export type IDL = {
   ];
 };
 export const Idl: IDL = {
-  version: '0.1.0',
-  name: 'cubic_contract',
+  version: '0.2.0',
+  name: 'cubik_contract',
   instructions: [
     {
       name: 'createUser',
@@ -269,14 +319,10 @@ export const Idl: IDL = {
           name: 'userId',
           type: 'string',
         },
-        {
-          name: 'metadata',
-          type: 'string',
-        },
       ],
     },
     {
-      name: 'projectInit',
+      name: 'createProject',
       accounts: [
         {
           name: 'authority',
@@ -301,17 +347,13 @@ export const Idl: IDL = {
       ],
       args: [
         {
-          name: 'projectname',
-          type: 'string',
-        },
-        {
-          name: 'metadata',
+          name: 'projectId',
           type: 'string',
         },
       ],
     },
     {
-      name: 'initChort',
+      name: 'createRound',
       accounts: [
         {
           name: 'authority',
@@ -319,7 +361,7 @@ export const Idl: IDL = {
           isSigner: true,
         },
         {
-          name: 'chortInitAccount',
+          name: 'roundAccount',
           isMut: true,
           isSigner: false,
         },
@@ -336,13 +378,21 @@ export const Idl: IDL = {
       ],
       args: [
         {
-          name: 'chortname',
+          name: 'roundId',
           type: 'string',
+        },
+        {
+          name: 'matchingPool',
+          type: 'u64',
+        },
+        {
+          name: 'projectSize',
+          type: 'u64',
         },
       ],
     },
     {
-      name: 'joinChort',
+      name: 'createContribution',
       accounts: [
         {
           name: 'authority',
@@ -350,17 +400,7 @@ export const Idl: IDL = {
           isSigner: true,
         },
         {
-          name: 'initChortAccount',
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: 'projectAccount',
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: 'projectChortAccount',
+          name: 'contributionAccount',
           isMut: true,
           isSigner: false,
         },
@@ -377,17 +417,141 @@ export const Idl: IDL = {
       ],
       args: [
         {
-          name: 'chortname',
+          name: 'roundId',
           type: 'string',
         },
         {
-          name: 'projectname',
+          name: 'projectId',
           type: 'string',
+        },
+        {
+          name: 'contributionId',
+          type: 'string',
+        },
+        {
+          name: 'amount',
+          type: 'u64',
+        },
+        {
+          name: 'usdAmount',
+          type: 'u64',
+        },
+        {
+          name: 'token',
+          type: 'publicKey',
         },
       ],
     },
   ],
   accounts: [
+    {
+      name: 'Contribution',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'authority',
+            type: 'publicKey',
+          },
+          {
+            name: 'projectId',
+            type: 'string',
+          },
+          {
+            name: 'roundId',
+            type: 'string',
+          },
+          {
+            name: 'token',
+            type: 'publicKey',
+          },
+          {
+            name: 'amount',
+            type: 'u64',
+          },
+          {
+            name: 'bump',
+            type: 'u8',
+          },
+        ],
+      },
+    },
+    {
+      name: 'Project',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'authority',
+            type: 'publicKey',
+          },
+          {
+            name: 'projectId',
+            type: 'string',
+          },
+          {
+            name: 'bump',
+            type: 'u8',
+          },
+        ],
+      },
+    },
+    {
+      name: 'Round',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'authority',
+            type: 'publicKey',
+          },
+          {
+            name: 'roundId',
+            type: 'string',
+          },
+          {
+            name: 'bump',
+            type: 'u8',
+          },
+          {
+            name: 'poolSize',
+            type: 'u64',
+          },
+          {
+            name: 'projectSize',
+            type: 'u64',
+          },
+        ],
+      },
+    },
+    {
+      name: 'RoundJoin',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'authority',
+            type: 'publicKey',
+          },
+          {
+            name: 'roundId',
+            type: 'string',
+          },
+          {
+            name: 'approve',
+            type: 'bool',
+          },
+          {
+            name: 'bump',
+            type: 'u8',
+          },
+          {
+            name: 'projectId',
+            type: 'string',
+          },
+        ],
+      },
+    },
     {
       name: 'User',
       type: {
@@ -398,72 +562,8 @@ export const Idl: IDL = {
             type: 'publicKey',
           },
           {
-            name: 'metadata',
+            name: 'userId',
             type: 'string',
-          },
-          {
-            name: 'bump',
-            type: 'u8',
-          },
-        ],
-      },
-    },
-    {
-      name: 'ProjectInit',
-      type: {
-        kind: 'struct',
-        fields: [
-          {
-            name: 'authority',
-            type: 'publicKey',
-          },
-          {
-            name: 'metadata',
-            type: 'string',
-          },
-          {
-            name: 'bump',
-            type: 'u8',
-          },
-        ],
-      },
-    },
-    {
-      name: 'InitChort',
-      type: {
-        kind: 'struct',
-        fields: [
-          {
-            name: 'authority',
-            type: 'publicKey',
-          },
-          {
-            name: 'chortName',
-            type: 'string',
-          },
-          {
-            name: 'active',
-            type: 'bool',
-          },
-          {
-            name: 'bump',
-            type: 'u8',
-          },
-        ],
-      },
-    },
-    {
-      name: 'ProjectChortInit',
-      type: {
-        kind: 'struct',
-        fields: [
-          {
-            name: 'project',
-            type: 'publicKey',
-          },
-          {
-            name: 'chort',
-            type: 'publicKey',
           },
           {
             name: 'bump',
