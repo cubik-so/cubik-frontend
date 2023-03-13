@@ -14,8 +14,6 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as anchor from '@project-serum/anchor';
-import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 import { useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -32,8 +30,6 @@ import { getUserNameStatus } from 'src/lib/api/authHelper';
 import { createUser } from 'src/lib/api/userHelper';
 import { AuthState, useAuthStore } from 'src/store/authStore';
 import { useUserStore } from 'src/store/userStore';
-import { connection, UserIx } from 'src/utils/acnhorProgram';
-import { v4 as uuidV4 } from 'uuid';
 import * as yup from 'yup';
 import FramerCarousel from './FramerCarousel';
 import ProfilePicture from './ProfilePicture';
@@ -150,44 +146,34 @@ const CreateProfileForm = () => {
         message: 'Not Available',
       });
     }
-    const transaction = new anchor.web3.Transaction();
-    const { blockhash } = await connection.getLatestBlockhash('finalized');
-    const ix = await UserIx(wallet as NodeWallet, uuidV4());
-    transaction.feePayer = wallet?.publicKey;
-    transaction.recentBlockhash = blockhash;
-    transaction.add(ix);
-    const signedTx = await wallet?.signTransaction!(transaction);
-    const serialized_transaction = signedTx?.serialize();
-    const sig = await connection.sendRawTransaction(serialized_transaction!);
-    if (sig) {
-      return await new Promise<void>((resolve) => {
-        createUser({
-          icon: user?.icon || (publicKey?.toBase58() as string),
-          username: data.username,
-          mainwallet: publicKey?.toBase58() as string,
-          verified: false,
-        }).then((res) => {
-          if (res.data) {
-            setUser({
-              id: res.data.id,
-              username: res.data.username,
-              icon: res.data.icon,
-              mainwallet: res.data.mainwallet,
-            });
-            console.log('2. new user created - ', user);
-            setAuthenticationState(AuthState.AUTHENTICATED);
-            //setCreatingNewProfileLoadingState(false);
-            console.log(
-              '3. authentication state set to authenticated, user set, now redirect is hit'
-            );
-            router.push(`/` + res.data.username);
-          } else {
-            setCreatingNewProfileLoadingState(false);
-          }
-        });
-        resolve();
+
+    return await new Promise<void>((resolve) => {
+      createUser({
+        icon: user?.icon || (publicKey?.toBase58() as string),
+        username: data.username,
+        mainwallet: publicKey?.toBase58() as string,
+        verified: false,
+      }).then((res) => {
+        if (res.data) {
+          setUser({
+            id: res.data.id,
+            username: res.data.username,
+            icon: res.data.icon,
+            mainwallet: res.data.mainwallet,
+          });
+          console.log('2. new user created - ', user);
+          setAuthenticationState(AuthState.AUTHENTICATED);
+          //setCreatingNewProfileLoadingState(false);
+          console.log(
+            '3. authentication state set to authenticated, user set, now redirect is hit'
+          );
+          router.push(`/` + res.data.username);
+        } else {
+          setCreatingNewProfileLoadingState(false);
+        }
       });
-    }
+      resolve();
+    });
   };
 
   if (creatingNewProfileLoadingState) {

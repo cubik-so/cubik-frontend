@@ -51,7 +51,7 @@
     "helius-sdk": "^0.4.0",
     "html-react-parser": "^3.0.12",
     "immer": "^9.0.17",
-    "nanoid": "^4.0.0",
+    "nanoid": "^4.0.1",
     "next": "^12.2.5",
     "next-transpile-modules": "^10.0.0",
     "react": "^18.0.0",

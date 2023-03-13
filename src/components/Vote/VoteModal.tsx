@@ -33,6 +33,9 @@ import {
 import { useState } from 'react';
 import { useController, UseControllerProps, useForm } from 'react-hook-form';
 import { BsArrowRight, BsTwitter } from 'react-icons/bs';
+import { CreateContribution } from 'src/lib/api/contributorHelper';
+import { useUserStore } from 'src/store/userStore';
+import { connection } from 'src/utils/acnhorProgram';
 import { sendSOL, sendSPL } from '../../utils/tokenTrasfer';
 import { tokens } from './tokens';
 
@@ -51,7 +54,7 @@ interface FormValues {
 }
 
 const defaultValues: FormValues = {
-  cohort: 'Superteam Grants Round', // make it to the clicked cohort the project is in
+  cohort: 'Cubik Grants', // make it to the clicked cohort the project is in
   amount: '',
   token: token[0].value,
   donation_to_matching_pool: 5,
@@ -159,7 +162,7 @@ const ControlledSelect = ({
   );
 };
 
-const VoteModalBody = () => {
+const VoteModalBody = ({ project_id }: { project_id: string }) => {
   const { publicKey, signTransaction } = useWallet();
   const {
     handleSubmit,
@@ -171,14 +174,20 @@ const VoteModalBody = () => {
   } = useForm({ defaultValues });
   const [successScreen, setSuccessScreen] = useState(false);
   const [signature, setSignature] = useState<string>('');
-  function getIx(values: any, connection: Connection) {
+  const { user } = useUserStore();
+  function getIx(
+    values: any,
+    connection: Connection,
+    amount: number | undefined,
+    transfer: string | undefined
+  ) {
     switch (values.token.label) {
       case 'USDC':
         return sendSPL(
           'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
           publicKey as PublicKey,
           new PublicKey('HzKYQnW67KxKQxqWZ5zZAKG44KAJU6K5stfSzJvG1hCi'),
-          JSON.parse(values.amount),
+          amount as number,
           connection
         );
 
@@ -194,29 +203,58 @@ const VoteModalBody = () => {
       case 'SOL':
         return sendSOL(
           publicKey as PublicKey,
-          new PublicKey('HzKYQnW67KxKQxqWZ5zZAKG44KAJU6K5stfSzJvG1hCi'),
-          JSON.parse(values.amount)
+          new PublicKey(transfer as string),
+          amount as number
         );
     }
   }
   const onSubmit = async (values: any) => {
-    const connection = new Connection(
-      process.env.NEXT_PUBLIC_RPC_URL as string
-    );
-    const ix = await getIx(values, connection);
-    const transaction = new Transaction();
-    transaction.add(...(ix as TransactionInstruction[]));
-    const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
-    transaction.feePayer = new PublicKey(publicKey as PublicKey);
-    const signedTx = await signTransaction!(transaction);
-    const serialized_transaction = signedTx.serialize();
-    const sig = await connection.sendRawTransaction(serialized_transaction);
-    //console.log(sig);
-    if (sig) {
-      setSuccessScreen(true);
-      setSignature(sig);
-      localStorage.setItem('amount-con', values.amount);
+    try {
+      let split =
+        (Number(values.amount) * values.donation_to_matching_pool) / 100;
+      let amount = Number(values.amount) - split;
+      console.log(amount, split);
+      console.log(values);
+
+      const ix = await getIx(
+        values,
+        connection,
+        amount,
+        '8FmtYrSAYpVE2Jr5AE5V79oDTRrpnBHPivWezefCKEaQ'
+      );
+      const splitIx = await getIx(
+        values,
+        connection,
+        split,
+        'CubicrLtPXHJnCmrsWmWgLUw9B4bS7cX5qUimJc66VAD'
+      );
+      const transaction = new Transaction();
+      transaction.add(...(ix as TransactionInstruction[]));
+      transaction.add(...(splitIx as TransactionInstruction[]));
+      const { blockhash } = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = new PublicKey(publicKey as PublicKey);
+      const signedTx = await signTransaction!(transaction);
+      const serialized_transaction = signedTx.serialize();
+      const sig = await connection.sendRawTransaction(serialized_transaction);
+      //console.log(sig);
+      if (sig) {
+        const res = await CreateContribution({
+          amount: amount,
+          userId: user?.id as string,
+          projectId: project_id,
+          split_amount: split,
+          token: values.token.label,
+          tx: sig,
+          usd_amount: amount * 20,
+        });
+        console.log(res);
+
+        setSuccessScreen(true);
+        setSignature(sig);
+      }
+    } catch (error) {
+      return console.log(error);
     }
     // backend
   };

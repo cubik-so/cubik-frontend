@@ -1,12 +1,10 @@
-import { userType } from './user';
-
-export type contributions = {
-  projectId: String;
-  projectName: String;
-  logo: String;
-  contributors: userType[];
+export type ContributionType = {
+  id?: string;
   amount: number;
-  token: String;
-  signature: String;
-  cubic_matching_pool_donation: number;
+  usd_amount: number;
+  split_amount: number;
+  token: string;
+  tx: string;
+  projectId: string;
+  userId: string;
 };

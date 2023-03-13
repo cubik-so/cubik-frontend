@@ -11,15 +11,11 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import * as anchor from '@project-serum/anchor';
-import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 import { useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
 import { Select } from 'chakra-react-select';
 import { useRouter } from 'next/router';
 import { Controller, useForm } from 'react-hook-form';
 import { createProject } from 'src/lib/api/projectsHelper';
-import { connection, ProjectIx } from 'src/utils/acnhorProgram';
-import { v4 as uuidV4 } from 'uuid';
 const Industry = [
   {
     label: 'NFT',
@@ -93,36 +89,25 @@ const CreateProject = () => {
   async function onSubmit(values: any) {
     console.log('submitted values', values);
 
-    const transaction = new anchor.web3.Transaction();
-    const { blockhash } = await connection.getLatestBlockhash('finalized');
-    const ix = await ProjectIx(wallet as NodeWallet, uuidV4());
-    transaction.feePayer = wallet?.publicKey;
-    transaction.recentBlockhash = blockhash;
-    transaction.add(ix);
-    const signedTx = await wallet?.signTransaction!(transaction);
-    const serialized_transaction = signedTx?.serialize();
-    const sig = await connection.sendRawTransaction(serialized_transaction!);
-    if (sig) {
-      // send a request to this route and submit project
-      // /project/create
-      createProject({
-        project_name: values.project_name,
-        owner_publickey: publicKey?.toBase58(),
-        long_description: values.long_description,
-        short_description: values.short_description,
-        logo: values.logo,
-        industry: values.industry,
-        twitter: values.twitter,
-        github: values.github,
-        discord: values.discord,
-      }).then((res) => {
-        console.log('project create response - ', res);
-        router.push({
-          pathname: '/projects/[projectId]',
-          query: { projectId: res.data.id },
-        });
+    // send a request to this route and submit project
+    // /project/create
+    createProject({
+      project_name: values.project_name,
+      owner_publickey: publicKey?.toBase58(),
+      long_description: values.long_description,
+      short_description: values.short_description,
+      logo: values.logo,
+      industry: values.industry,
+      twitter: values.twitter,
+      github: values.github,
+      discord: values.discord,
+    }).then((res) => {
+      console.log('project create response - ', res);
+      router.push({
+        pathname: '/projects/[projectId]',
+        query: { projectId: res.data.id },
       });
-    }
+    });
   }
   return (
     <Container

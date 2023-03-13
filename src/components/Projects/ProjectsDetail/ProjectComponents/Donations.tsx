@@ -15,6 +15,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import VoteModalBody from 'src/components/Vote/VoteModal';
+import { formatNumberWithK } from 'src/lib/functions';
 import WalletAdd from '../../../Wallet/WalletAdd';
 // section 1 part 2
 export const ProjectsDonation = ({
@@ -64,7 +65,7 @@ export const ProjectsDonation = ({
             color={'#999999'}
           />
           <ModalBody roundedBottom={'8px'} backgroundColor={'#141414'}>
-            <VoteModalBody />
+            <VoteModalBody project_id={projectDetails.id ?? ''} />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -76,8 +77,7 @@ export const ProjectsDonation = ({
       >
         <VStack align={'end'} gap="0" spacing="0" pb="0.5rem">
           <Box as="p" textStyle="display3">
-            {/* {formatNumberWithK(projectDetails.total_funding_raised)} */}$
-            {!localStorage.getItem('amount-con') ? '0' : '0.002'}
+            {formatNumberWithK(projectDetails.total)}$
           </Box>
           <Box as="p" textStyle="body2" color="#B2B2B2">
             Funding Raised

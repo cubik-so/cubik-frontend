@@ -1,17 +1,17 @@
 import * as anchor from '@project-serum/anchor';
 import { Program } from '@project-serum/anchor';
+import { clusterApiUrl } from '@solana/web3.js';
 import { IDL, Idl } from './program';
 // import {
 
-const mainnetId = 'Ce6uqRiNkmsg5GcwTpCmTsxbUX566ssD2qrtDRHDaMEJ';
-export const PROGRAM_ID = new anchor.web3.PublicKey(mainnetId);
-// const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
+const Id = 'HVwXMnZcktEy98VBybjgSs48x8fHuRuurbZhsXoZPQiz';
+export const PROGRAM_ID = new anchor.web3.PublicKey(Id);
 
 const opts = {
   preflightCommitment: 'processed' as anchor.web3.ConfirmOptions,
 };
 export const connection = new anchor.web3.Connection(
-  'http://localhost:8899',
+  clusterApiUrl('devnet'),
   opts.preflightCommitment
 );
 export const getProvider = (wallet: anchor.Wallet) => {
@@ -40,10 +40,11 @@ export const anchorProgram = (wallet: anchor.Wallet) => {
 export const UserIx = async (anchorWallet: anchor.Wallet, userId: string) => {
   const program = anchorProgram(anchorWallet);
 
-  const [user_account] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [user_account] = await anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from('user'), Buffer.from(userId)],
     program.programId
   );
+  console.log(user_account.toBase58());
 
   const ix = await program.methods
     .createUser(userId)
@@ -63,8 +64,8 @@ export const ProjectIx = async (
   projectId: string
 ) => {
   const program = anchorProgram(anchorWallet);
-  const [project_account] = anchor.web3.PublicKey.findProgramAddressSync(
-    [Buffer.from('project'), Buffer.from(projectId)],
+  const [project_account] = await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from('project'), Buffer.from('abcad')],
     program.programId
   );
   const ix = await program.methods
