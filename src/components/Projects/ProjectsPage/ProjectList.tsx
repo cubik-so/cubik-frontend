@@ -70,7 +70,10 @@ const ProjectCard = ({ project }: PropsType) => {
               {project.project_name}
             </Box>
             <Heading as="p" textStyle={{ base: 'title2', md: 'title1' }}>
-              ${formatNumberWithK(project.total)}
+              $
+              {formatNumberWithK(
+                Number(((project.usd_total as number) * 19).toFixed(2))
+              )}
             </Heading>
           </HStack>
           <HStack w="full" justify="space-between">
